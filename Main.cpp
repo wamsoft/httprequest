@@ -429,7 +429,7 @@ protected:
 	// ユーザメッセージレシーバの登録/解除
 	void setReceiver(bool enable) {
 		tTJSVariant mode     = enable ? (tTVInteger)(tjs_int)wrmRegister : (tTVInteger)(tjs_int)wrmUnregister;
-		tTJSVariant proc     = (tTVInteger)(tjs_int)receiver;
+		tTJSVariant proc     = (tTVInteger)(tjs_int64)receiver;
 		tTJSVariant userdata = (tTVInteger)0;
 		tTJSVariant *p[] = {&mode, &proc, &userdata};
 		if (window->FuncCall(0, L"registerMessageReceiver", NULL, NULL, 4, p, objthis) != TJS_S_OK) {
@@ -589,7 +589,7 @@ protected:
 		{
 			tTJSVariant val;
 			window->PropGet(0, TJS_W("HWND"), NULL, &val, objthis);
-			hwnd = reinterpret_cast<HWND>((tjs_int)(val));
+			hwnd = reinterpret_cast<HWND>((tjs_int64)(val));
 		}
 
 	    if (async) ::PostMessage(hwnd, WM_HTTP_READYSTATE, (WPARAM)this, (LPARAM)READYSTATE_SENT);
