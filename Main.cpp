@@ -368,7 +368,68 @@ public:
 	DWORD getContentLength() {
 		return http.getContentLength();
 	}
-	
+
+
+	static tjs_error encodeBase64(tTJSVariant *result, tjs_int numparams, tTJSVariant **params, iTJSDispatch2 *objthis) {
+		if (numparams < 1) return TJS_E_BADPARAMCOUNT;
+		if (!result) return TJS_S_OK; // no-result
+		switch (params[0]->Type()) {
+		case tvtString:
+			{
+				ttstr text(*params[0]);
+				vector<BYTE> temp;
+				int enc  = ::getEncoding((numparams > 1) ? params[1]->GetString() : NULL);
+				UINT len = ::getWCToMBLen(enc, text.c_str(), text.length());
+				if (len > 0) {
+					temp.resize(len);
+					UINT blen = temp.size();
+					UINT wlen = text.length();
+					::convWCToMB(enc, text.c_str(), &wlen, (char*)&temp[0], &blen);
+
+					text = ttstr(base64encode((const unsigned char*)&temp[0], blen).c_str());
+					*result = tTJSVariant(text);
+				} else result->Clear();
+			}
+			break;
+		case tvtOctet:
+			{
+				tTJSVariantOctet *oct = params[0]->AsOctetNoAddRef();
+				if (oct) {
+					ttstr text(base64encode(oct->GetData(), oct->GetLength()).c_str());
+					*result = tTJSVariant(text);
+				} else result->Clear();
+			}
+			break;
+		default:
+			return TJS_E_INVALIDPARAM;
+		}
+		return TJS_S_OK;
+	}
+	static tjs_error decodeBase64(tTJSVariant *result, tjs_int numparams, tTJSVariant **params, iTJSDispatch2 *objthis) {
+		if (numparams < 1) return TJS_E_BADPARAMCOUNT;
+		if (!result) return TJS_S_OK; // no-result
+		result->Clear();
+		switch (params[0]->Type()) {
+		case tvtString:
+			{
+				blob data;
+				ttstr base64(*params[0]);
+				if (base64decode(data, base64.c_str(), base64.length())) *result = tTJSVariant(&data[0], data.size());
+			}
+			break;
+		case tvtOctet:
+			{
+				blob data;
+				tTJSVariantOctet *oct = params[0]->AsOctetNoAddRef();
+				if (oct && base64decode(data, oct->GetData(), oct->GetLength())) *result = tTJSVariant(&data[0], data.size());
+			}
+			break;
+		default:
+			return TJS_E_INVALIDPARAM;
+		}
+		return TJS_S_OK;
+	}
+
 	/**
 	 * インスタンス生成ファクトリ
 	 */
@@ -716,6 +777,9 @@ NCB_REGISTER_CLASS(HttpRequest) {
 	NCB_PROPERTY_RO(contentType, getContentType);
 	NCB_PROPERTY_RO(contentTypeEncoding, getContentTypeEncoding);
 	NCB_PROPERTY_RO(contentLength, getContentLength);
+
+	RawCallback(TJS_W("encodeBase64"), &Class::encodeBase64, 0);
+	RawCallback(TJS_W("decodeBase64"), &Class::decodeBase64, 0);
 }
 
 NCB_PRE_REGIST_CALLBACK(initEncoding);
