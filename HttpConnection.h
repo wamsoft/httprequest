@@ -3,7 +3,7 @@
 
 #include <windows.h>
 #include <tchar.h>
-#include <WinInet.h>
+#include <wininet.h>
 #include <vector>
 #include <string>
 #include <map>
