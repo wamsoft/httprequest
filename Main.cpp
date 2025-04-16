@@ -386,7 +386,7 @@ public:
 					UINT wlen = text.length();
 					::convWCToMB(enc, text.c_str(), &wlen, (char*)&temp[0], &blen);
 
-					text = ttstr(base64encode((const unsigned char*)&temp[0], blen).c_str());
+					text = ttstr(base64encode((const char*)&temp[0], blen).c_str());
 					*result = tTJSVariant(text);
 				} else result->Clear();
 			}
@@ -395,7 +395,7 @@ public:
 			{
 				tTJSVariantOctet *oct = params[0]->AsOctetNoAddRef();
 				if (oct) {
-					ttstr text(base64encode(oct->GetData(), oct->GetLength()).c_str());
+					ttstr text(base64encode((const char*)oct->GetData(), oct->GetLength()).c_str());
 					*result = tTJSVariant(text);
 				} else result->Clear();
 			}
@@ -414,14 +414,14 @@ public:
 			{
 				blob data;
 				ttstr base64(*params[0]);
-				if (base64decode(data, base64.c_str(), base64.length())) *result = tTJSVariant(&data[0], data.size());
+				if (base64decode(data, base64.c_str(), base64.length())) *result = tTJSVariant((const tjs_uint8*)&data[0], data.size());
 			}
 			break;
 		case tvtOctet:
 			{
 				blob data;
 				tTJSVariantOctet *oct = params[0]->AsOctetNoAddRef();
-				if (oct && base64decode(data, oct->GetData(), oct->GetLength())) *result = tTJSVariant(&data[0], data.size());
+				if (oct && base64decode(data, (const char*)oct->GetData(), oct->GetLength())) *result = tTJSVariant((const tjs_uint8*)&data[0], data.size());
 			}
 			break;
 		default:
