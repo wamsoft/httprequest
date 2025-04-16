@@ -490,7 +490,7 @@ protected:
 	// ユーザメッセージレシーバの登録/解除
 	void setReceiver(bool enable) {
 		tTJSVariant mode     = enable ? (tTVInteger)(tjs_int)wrmRegister : (tTVInteger)(tjs_int)wrmUnregister;
-		tTJSVariant proc     = (tTVInteger)(tjs_int64)receiver;
+		tTJSVariant proc     = (tTVInteger)(tjs_intptr_t)receiver;
 		tTJSVariant userdata = (tTVInteger)0;
 		tTJSVariant *p[] = {&mode, &proc, &userdata};
 		if (window->FuncCall(0, L"registerMessageReceiver", NULL, NULL, 4, p, objthis) != TJS_S_OK) {
