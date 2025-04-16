@@ -66,7 +66,7 @@ base64encode_tmpl(const SRC *input, int len) {
 }
 
 tstring base64encode(const TCHAR         *input, int len) { return base64encode_tmpl(input, len); }
-tstring base64encode(const unsigned char *input, int len) { return base64encode_tmpl(input, len); }
+tstring base64encode(const char          *input, int len) { return base64encode_tmpl(input, len); }
 
 
 #define XX 255
@@ -143,6 +143,6 @@ base64decode_tmpl(blob &output, const SRC *input, int len) {
 }
 
 bool base64decode(blob &output, const TCHAR         *input, int len) { return base64decode_tmpl(output, input, len); }
-bool base64decode(blob &output, const unsigned char *input, int len) { return base64decode_tmpl(output, input, len); }
+bool base64decode(blob &output, const char          *input, int len) { return base64decode_tmpl(output, input, len); }
 
 
